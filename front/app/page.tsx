@@ -1,78 +1,90 @@
 "use client";
 
 import { useState } from "react";
+import SearchBar from "@/components/SearchBar";
+import ResultCard from "@/components/ResultCard";
+import { SearchResult } from "@/types";
 
 export default function Home() {
-  // We only need to store results now, form inputs are handled by FormData
-  const [results, setResults] = useState<string[] | null>(null);
+  const [results, setResults] = useState<SearchResult[] | null>(null);
+  const [time, setTime] = useState<number | null>(null);
 
-  // React 19 standard: using form actions directly
+  const [currentAlgo, setCurrentAlgo] = useState("tfidf");
+
   const handleSearch = async (formData: FormData) => {
-    // Extract values directly from the form submission
     const query = formData.get("query")?.toString();
-    const algorithm = formData.get("algorithm")?.toString();
+    const algorithm = formData.get("algorithm")?.toString() || "tfidf";
 
     if (!query?.trim()) return;
 
-    // Placeholder for future backend fetch
-    console.log("Fetching data for:", query, "with algorithm:", algorithm);
+    setCurrentAlgo(algorithm);
 
-    // Simulate an API response for testing purposes
-    setResults([
-      `Result 1 for "${query}" (${algorithm})`,
-      `Result 2 for "${query}" (${algorithm})`,
-    ]);
+    try {
+      const backendUrl = `http://127.0.0.1:8000/api/search?q=${encodeURIComponent(query)}&algorithm=${algorithm}`;
+
+      const response = await fetch(backendUrl, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server responded with status: ${response.status}`);
+      }
+
+      const { results: data, executionTime } = (await response.json()) as {
+        results: SearchResult[];
+        executionTime: number;
+      };
+
+      setTime(executionTime);
+      setResults(data);
+    } catch (error) {
+      console.error("Data transfer failed:", error);
+      setResults([]);
+    }
   };
 
+  const hasResults = results !== null;
+
   return (
-    // Main container takes full height and centers content
-    <main className="flex min-h-screen flex-col items-center justify-center p-4">
-      {/* The action attribute replaces onSubmit and automatically prevents default reload */}
-      <form
-        action={handleSearch}
-        className="flex w-full max-w-2xl flex-col gap-3 transition-all duration-500 ease-in-out sm:flex-row"
-      >
-        <input
-          type="text"
-          name="query"
-          placeholder="What are you looking for?"
-          className="grow rounded-lg border border-gray-300 px-4 py-3 text-lg shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+    <main
+      className={`flex min-h-screen flex-col bg-white transition-all duration-500 p-4 ${hasResults ? "justify-start" : "justify-center"}`}
+    >
+      {hasResults && (
+        <div className="mx-auto w-full max-w-2xl animate-fade-in pb-28 pt-4">
+          <div className="mb-6 flex items-center justify-between border-b border-gray-100 pb-3">
+            <h2 className="text-sm font-medium text-gray-500">
+              Results found: {results.length}
+            </h2>
+            <h2 className="text-sm font-medium text-gray-500">
+              It took: {time}
+            </h2>
+            <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-750/10">
+              Algorithm: {currentAlgo.toUpperCase()}
+            </span>
+          </div>
 
-        <select
-          name="algorithm"
-          defaultValue="tfidf"
-          className="rounded-lg border border-gray-300 bg-white px-4 py-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="tfidf">TF-IDF</option>
-          <option value="bm25">BM25</option>
-          <option value="neural">Neural Search</option>
-        </select>
-
-        <button
-          type="submit"
-          className="rounded-lg bg-blue-600 px-6 py-3 font-medium text-white shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        >
-          Search
-        </button>
-      </form>
-
-      {/* Render results only if they exist */}
-      {results && (
-        <div className="mt-8 w-full max-w-2xl">
-          <h2 className="mb-4 text-sm text-gray-500">Search results:</h2>
-          <ul className="space-y-4">
-            {results.map((res, index) => (
-              <li
-                key={index}
-                className="rounded-lg border border-gray-100 p-4 shadow-sm transition-shadow hover:shadow-md"
-              >
-                {res}
-              </li>
+          <ul className="space-y-6">
+            {results.map((item) => (
+              <ResultCard key={item.id} item={item} />
             ))}
           </ul>
         </div>
       )}
+
+      <div
+        className={`mx-auto w-full max-w-2xl ${
+          hasResults
+            ? "fixed bottom-0 left-0 right-0 max-w-full border-t border-gray-100 bg-white/80 p-4 backdrop-blur-md"
+            : "relative"
+        }`}
+      >
+        <div className={hasResults ? "mx-auto max-w-2xl" : ""}>
+          <SearchBar action={handleSearch} currentAlgo={currentAlgo} />
+        </div>
+      </div>
     </main>
   );
 }
