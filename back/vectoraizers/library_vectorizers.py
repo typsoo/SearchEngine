@@ -7,9 +7,12 @@ from nltk.stem import SnowballStemmer
 import numpy as np
 import nltk
 
-nltk.download('punkt', quiet=True)
 
 class LibraryTfidfVectorizer:
+    """
+    Library-based implementation of TF-IDF and SVD (LSI) using scikit-learn.
+    Used as a baseline to compare performance and accuracy against the custom SVD implementation.
+    """
     def __init__(self, k=200):
         self.stemmer = SnowballStemmer("english")
         self.k = k
@@ -51,6 +54,10 @@ class LibraryTfidfVectorizer:
 
 
 class LibraryBm25Vectorizer:
+    """
+    Library-based implementation of Okapi BM25 using rank_bm25 and scikit-learn (for preprocessing).
+    Used as a baseline to compare performance and accuracy against the custom BM25 implementation.
+    """
     def __init__(self):
         self.stemmer = SnowballStemmer("english")
         self.analyzer  = None

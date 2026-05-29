@@ -38,7 +38,7 @@ export default function SearchBar({
           <option value="custom_tfidf">Custom TF-IDF</option>
           <option value="custom_bm25">Custom BM25</option>
           <option value="custom_svd">Custom TF-IDF with SVD</option>
-          <option value="lib_tfidf">Library TF-IDF</option>
+          <option value="lib_tfidf">Library TF-IDF with SVD</option>
           <option value="lib_bm25">Library BM25</option>
         </select>
 
