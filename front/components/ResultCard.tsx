@@ -18,11 +18,6 @@ export default function ResultCard({ item }: ResultCardProps) {
         {item.title}
       </a>
 
-      <p
-        className="mt-1 text-sm leading-relaxed text-gray-600"
-        dangerouslySetInnerHTML={{ __html: item.snippet }}
-      />
-
       <div className="mt-2 flex items-center gap-3 text-xs text-gray-400">
         <span>
           Relevance:{" "}
