@@ -10,9 +10,8 @@ import nltk
 nltk.download('punkt', quiet=True)
 
 class LibraryTfidfVectorizer:
-    def __init__(self, use_svd=False, k=300):
+    def __init__(self, k=200):
         self.stemmer = SnowballStemmer("english")
-        self.use_svd = use_svd
         self.k = k
         
         self.vectorizer = TfidfVectorizer(
@@ -27,7 +26,7 @@ class LibraryTfidfVectorizer:
 
         )
         
-        self.svd_model = TruncatedSVD(n_components=self.k, random_state=42) if use_svd else None
+        self.svd_model = TruncatedSVD(n_components=self.k, random_state=42)
         self.documents_matrix = None
 
     def _stem_tokenizer(self, text):
@@ -37,15 +36,13 @@ class LibraryTfidfVectorizer:
     def fit_transform(self, documents):
         tfidf_sparse_matrix = self.vectorizer.fit_transform(documents)
 
-        if self.use_svd:
-            self.documents_matrix = self.svd_model.fit_transform(tfidf_sparse_matrix)
-        else:
-            self.documents_matrix = tfidf_sparse_matrix
+        self.documents_matrix = self.svd_model.fit_transform(tfidf_sparse_matrix)
+
 
     def search(self, query_text, top_k=5):
         query_vector = self.vectorizer.transform([query_text])
 
-        if self.use_svd: query_vector = self.svd_model.transform(query_vector)
+        query_vector = self.svd_model.transform(query_vector)
 
         similarities = cosine_similarity(query_vector, self.documents_matrix)[0]
 

@@ -5,7 +5,7 @@ from typing import List, Dict, Any
 
 class BaseEngine(ABC):
     def __init__(self):
-        with open("doc_names.pkl", "rb") as f:
+        with open("./data/doc_names.pkl", "rb") as f:
             self.doc_names = pickle.load(f)
             
     @abstractmethod
@@ -28,7 +28,7 @@ class BaseEngine(ABC):
 class CustomTfidfEngine(BaseEngine):
     def __init__(self):
         super().__init__()
-        with open("custom_tfidf.pkl", "rb") as f:
+        with open("./data/custom_tfidf.pkl", "rb") as f:
             self.model = pickle.load(f)
 
     def search(self, query: str, top_k: int = 5) -> List[Dict[str, Any]]:
@@ -38,7 +38,7 @@ class CustomTfidfEngine(BaseEngine):
 class CustomBm25Engine(BaseEngine):
     def __init__(self):
         super().__init__()
-        with open("custom_bm25.pkl", "rb") as f:
+        with open("./data/custom_bm25.pkl", "rb") as f:
             self.model = pickle.load(f)
 
     def search(self, query: str, top_k: int = 5) -> List[Dict[str, Any]]:
@@ -49,7 +49,7 @@ class CustomBm25Engine(BaseEngine):
 class CustomSvdEngine(BaseEngine):
     def __init__(self):
         super().__init__()
-        with open("custom_svd.pkl", "rb") as f:
+        with open("./data/custom_svd.pkl", "rb") as f:
             self.model = pickle.load(f)
     def search(self, query: str, top_k: int = 5):
         return self._format_results(self.model.search(query, top_k), "Custom SVD (LSI)")
@@ -58,7 +58,7 @@ class CustomSvdEngine(BaseEngine):
 class LibraryTfidfEngine(BaseEngine):
     def __init__(self):
         super().__init__()
-        with open("lib_tfidf.pkl", "rb") as f:
+        with open("./data/lib_tfidf.pkl", "rb") as f:
             self.model = pickle.load(f)
     def search(self, query: str, top_k: int = 5):
         return self._format_results(self.model.search(query, top_k), "Sklearn TF-IDF")
@@ -66,7 +66,7 @@ class LibraryTfidfEngine(BaseEngine):
 class LibraryBm25Engine(BaseEngine):
     def __init__(self):
         super().__init__()
-        with open("lib_bm25.pkl", "rb") as f:
+        with open("./data/lib_bm25.pkl", "rb") as f:
             self.model = pickle.load(f)
     def search(self, query: str, top_k: int = 5):
         return self._format_results(self.model.search(query, top_k), "Rank_BM25")

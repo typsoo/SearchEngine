@@ -1,6 +1,6 @@
 import time
 import os
-from fastapi import FastAPI, Query
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
@@ -42,12 +42,12 @@ class SearchResultResponse(BaseModel):
 
 @app.get("/api/search", response_model=List[SearchResultResponse])
 async def search(
-    q: str = Query(..., description="Поисковый запрос"),
-    algorithm: str = Query("tfidf", description="Алгоритм поиска")
+    q: str,
+    algorithm: str
 ):
     start_time = time.time()
     engine = engines.get(algorithm.lower())
-    raw_results = engine.search(query=q, top_k=5)
+    raw_results = engine.search(query=q, top_k=8)
 
     
     execution_time = round(time.time() - start_time, 4)
