@@ -3,22 +3,27 @@
 import { useState } from "react";
 import SearchBar from "@/components/SearchBar";
 import ResultCard from "@/components/ResultCard";
+import WelcomeText from "./WelcomeText";
+import MorphingBackground from "./MorphingBackground";
 import { SearchResult } from "@/types";
 
 export default function SearchSection() {
   const [results, setResults] = useState<SearchResult[] | null>(null);
   const [time, setTime] = useState<number | null>(null);
-  const [currentAlgo, setCurrentAlgo] = useState("tfidf");
-
   const [searchQuery, setSearchQuery] = useState("");
 
-  const handleSearch = async (formData: FormData) => {
+  const [dropdownAlgo, setDropdownAlgo] = useState("custom_tfidf");
+  const [appliedAlgo, setAppliedAlgo] = useState("custom_tfidf");
+
+  const handleSearch = async (e: React.SyntheticEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
     const query = formData.get("query")?.toString();
-    const algorithm = formData.get("algorithm")?.toString() || "tfidf";
+
+    const algorithm = formData.get("algorithm")?.toString() || dropdownAlgo;
 
     if (!query?.trim()) return;
-
-    setCurrentAlgo(algorithm);
 
     try {
       const backendUrl = `http://127.0.0.1:8000/api/search?q=${encodeURIComponent(query)}&algorithm=${algorithm}`;
@@ -41,6 +46,8 @@ export default function SearchSection() {
 
       setTime(executionTime);
       setResults(data);
+
+      setAppliedAlgo(algorithm);
     } catch (error) {
       console.error("Data transfer failed:", error);
       setResults([]);
@@ -51,19 +58,21 @@ export default function SearchSection() {
 
   return (
     <div
-      className={`flex min-h-screen flex-col bg-white transition-all duration-500 p-4 ${hasResults ? "justify-start" : "justify-center"}`}
+      className={`relative flex min-h-screen flex-col bg-slate-50 transition-all duration-500 p-4 ${hasResults ? "justify-start" : "justify-center"}`}
     >
+      <MorphingBackground />
+
       {hasResults && (
-        <div className="mx-auto w-full max-w-2xl animate-fade-in pb-28 pt-4">
-          <div className="mb-6 flex items-center justify-between border-b border-gray-100 pb-3">
+        <div className="relative z-10 mx-auto w-full md:max-w-[75%] pb-36 pt-4">
+          <div className="mb-6 flex items-center justify-between border-b border-gray-200 pb-3">
             <h2 className="text-sm font-medium text-gray-500">
               Results found: {results.length}
             </h2>
             <h2 className="text-sm font-medium text-gray-500">
               It took: {time} ms
             </h2>
-            <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-750/10">
-              Algorithm: {currentAlgo.toUpperCase()}
+            <span className="inline-flex items-center rounded-md bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-700/10">
+              Algorithm: {appliedAlgo.toUpperCase()}
             </span>
           </div>
 
@@ -76,19 +85,22 @@ export default function SearchSection() {
       )}
 
       <div
-        className={`mx-auto w-full max-w-2xl ${
+        className={`mx-auto w-full ${
           hasResults
-            ? "fixed bottom-0 left-0 right-0 max-w-full border-t border-gray-100 bg-white/80 p-4 backdrop-blur-md"
-            : "relative"
+            ? "fixed bottom-0 left-0 right-0 z-20 max-w-full bg-transparent p-6"
+            : "relative z-10 max-w-2xl"
         }`}
       >
-        <div className={hasResults ? "mx-auto max-w-2xl" : ""}>
+        {!hasResults && <WelcomeText />}
+
+        <div className={hasResults ? "mx-auto w-full md:max-w-[75%]" : ""}>
           <SearchBar
-            action={handleSearch}
-            currentAlgo={currentAlgo}
+            onSubmit={handleSearch}
+            currentAlgo={dropdownAlgo}
+            setAlgo={setDropdownAlgo}
             query={searchQuery}
             setQuery={setSearchQuery}
-          />{" "}
+          />
         </div>
       </div>
     </div>

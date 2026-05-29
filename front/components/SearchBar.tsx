@@ -1,33 +1,39 @@
 interface SearchBarProps {
-  action: (formData: FormData) => void;
+  onSubmit: (e: React.SyntheticEvent<HTMLFormElement>) => void;
   currentAlgo: string;
   query: string;
   setQuery: (value: string) => void;
+  setAlgo: (value: string) => void;
 }
 
 export default function SearchBar({
-  action,
+  onSubmit,
   currentAlgo,
   query,
   setQuery,
+  setAlgo,
 }: SearchBarProps) {
   return (
-    <form action={action} className="flex w-full flex-col gap-3 sm:flex-row">
+    <form
+      onSubmit={onSubmit}
+      className="group flex w-full items-center rounded-full border border-gray-200 bg-white/95 p-2 shadow-lg transition-all backdrop-blur-sm focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20"
+    >
       <input
         type="text"
         name="query"
         required
         value={query ?? ""}
-        placeholder="Enter your search query..."
         onChange={(e) => setQuery(e.target.value)}
-        className="grow rounded-xl border border-gray-300 bg-white px-4 py-3 text-base shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+        placeholder="Enter your search query..."
+        className="min-w-0 grow bg-transparent px-5 py-3 text-base text-gray-900 outline-none placeholder:text-gray-400"
       />
 
-      <div className="flex gap-2">
+      <div className="relative flex items-center">
         <select
           name="algorithm"
-          defaultValue={currentAlgo}
-          className="rounded-xl border border-gray-300 bg-white px-3 py-3 text-sm font-medium shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+          value={currentAlgo}
+          onChange={(e) => setAlgo(e.target.value)}
+          className="appearance-none cursor-pointer bg-transparent py-3 pl-3 pr-7 text-right text-sm font-medium text-gray-700 outline-none transition-colors hover:text-gray-900 focus:text-blue-600"
         >
           <option value="custom_tfidf">Custom TF-IDF</option>
           <option value="custom_bm25">Custom BM25</option>
@@ -36,13 +42,30 @@ export default function SearchBar({
           <option value="lib_bm25">Library BM25</option>
         </select>
 
-        <button
-          type="submit"
-          className="grow rounded-xl bg-blue-600 px-6 py-3 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:grow-0"
-        >
-          Search
-        </button>
+        <div className="pointer-events-none absolute right-2 flex items-center text-gray-400 group-focus-within:text-blue-500">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </div>
       </div>
+
+      <button
+        type="submit"
+        className="ml-2 shrink-0 rounded-full bg-blue-600 px-7 py-3 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      >
+        Search
+      </button>
     </form>
   );
 }
