@@ -1,29 +1,25 @@
+import Form from "next/form";
+
 interface SearchBarProps {
-  onSubmit: (e: React.SyntheticEvent<HTMLFormElement>) => void;
-  currentAlgo: string;
-  query: string;
-  setQuery: (value: string) => void;
-  setAlgo: (value: string) => void;
+  defaultQuery?: string;
+  defaultAlgorithm?: string;
 }
 
 export default function SearchBar({
-  onSubmit,
-  currentAlgo,
-  query,
-  setQuery,
-  setAlgo,
+  defaultQuery = "",
+  defaultAlgorithm = "custom_tfidf",
 }: SearchBarProps) {
   return (
-    <form
-      onSubmit={onSubmit}
+    <Form
+      action="/search"
       className="group flex w-full items-center rounded-full border border-gray-200 bg-white/95 p-2 shadow-lg transition-all backdrop-blur-sm focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20"
     >
       <input
         type="text"
-        name="query"
+        name="q"
         required
-        value={query ?? ""}
-        onChange={(e) => setQuery(e.target.value)}
+        pattern=".*\S.*"
+        defaultValue={defaultQuery}
         placeholder="Enter your search query..."
         className="min-w-0 grow bg-transparent px-5 py-3 text-base text-gray-900 outline-none placeholder:text-gray-400"
       />
@@ -31,8 +27,7 @@ export default function SearchBar({
       <div className="relative flex items-center">
         <select
           name="algorithm"
-          value={currentAlgo}
-          onChange={(e) => setAlgo(e.target.value)}
+          defaultValue={defaultAlgorithm}
           className="appearance-none cursor-pointer bg-transparent py-3 pl-3 pr-7 text-right text-sm font-medium text-gray-700 outline-none transition-colors hover:text-gray-900 focus:text-blue-600"
         >
           <option value="custom_tfidf">Custom TF-IDF</option>
@@ -66,6 +61,6 @@ export default function SearchBar({
       >
         Search
       </button>
-    </form>
+    </Form>
   );
 }

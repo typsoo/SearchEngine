@@ -7,8 +7,6 @@ interface ResultCardProps {
 export default function ResultCard({ item }: ResultCardProps) {
   return (
     <li className="group flex flex-col">
-      <span className="mb-1 truncate text-xs text-gray-400">{item.url}</span>
-
       <a
         href={item.url}
         target="_blank"

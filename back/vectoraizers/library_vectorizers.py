@@ -1,11 +1,10 @@
-from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
-from sklearn.decomposition import TruncatedSVD
-from sklearn.metrics.pairwise import cosine_similarity
-from rank_bm25 import BM25Okapi
-from nltk.tokenize import word_tokenize
-from nltk.stem import SnowballStemmer
 import numpy as np
-import nltk
+from nltk.stem import SnowballStemmer
+from nltk.tokenize import word_tokenize
+from rank_bm25 import BM25Okapi
+from sklearn.decomposition import TruncatedSVD
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 
 class LibraryTfidfVectorizer:
@@ -13,12 +12,13 @@ class LibraryTfidfVectorizer:
     Library-based implementation of TF-IDF and SVD (LSI) using scikit-learn.
     Used as a baseline to compare performance and accuracy against the custom SVD implementation.
     """
+
     def __init__(self, k=200):
         self.stemmer = SnowballStemmer("english")
         self.k = k
-        
+
         self.vectorizer = TfidfVectorizer(
-            stop_words='english',
+            stop_words="english",
             lowercase=True,
             min_df=2,
             max_df=0.8,
@@ -26,9 +26,8 @@ class LibraryTfidfVectorizer:
             tokenizer=self._stem_tokenizer,
             token_pattern=None,
             ngram_range=(1, 2),
-
         )
-        
+
         self.svd_model = TruncatedSVD(n_components=self.k, random_state=42)
         self.documents_matrix = None
 
@@ -41,7 +40,6 @@ class LibraryTfidfVectorizer:
 
         self.documents_matrix = self.svd_model.fit_transform(tfidf_sparse_matrix)
 
-
     def search(self, query_text, top_k=5):
         query_vector = self.vectorizer.transform([query_text])
 
@@ -50,7 +48,11 @@ class LibraryTfidfVectorizer:
         similarities = cosine_similarity(query_vector, self.documents_matrix)[0]
 
         top_indices = np.argsort(similarities)[-top_k:][::-1]
-        return [(int(idx), float(similarities[idx])) for idx in top_indices if similarities[idx] > 0]
+        return [
+            (int(idx), float(similarities[idx]))
+            for idx in top_indices
+            if similarities[idx] > 0
+        ]
 
 
 class LibraryBm25Vectorizer:
@@ -58,17 +60,17 @@ class LibraryBm25Vectorizer:
     Library-based implementation of Okapi BM25 using rank_bm25 and scikit-learn (for preprocessing).
     Used as a baseline to compare performance and accuracy against the custom BM25 implementation.
     """
+
     def __init__(self):
         self.stemmer = SnowballStemmer("english")
-        self.analyzer  = None
+        self.analyzer = None
 
         self.text_processor = CountVectorizer(
-            stop_words='english',
+            stop_words="english",
             lowercase=True,
             tokenizer=self._stem_tokenizer,
             token_pattern=None,
-            ngram_range=(1, 2),   
-
+            ngram_range=(1, 2),
         )
         self.bm25 = None
 
@@ -87,4 +89,6 @@ class LibraryBm25Vectorizer:
         scores = self.bm25.get_scores(query_tokens)
 
         top_indices = np.argsort(scores)[-top_k:][::-1]
-        return [(int(idx), float(scores[idx])) for idx in top_indices if scores[idx] > 0]
+        return [
+            (int(idx), float(scores[idx])) for idx in top_indices if scores[idx] > 0
+        ]

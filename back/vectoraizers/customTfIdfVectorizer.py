@@ -1,8 +1,10 @@
 import math
 from collections import Counter
+
 import numpy as np
 from scipy.sparse import csc_matrix
 from vectoraizers.baseVectorizer import BaseVectorizer
+
 
 class CustomTfidfVectorizer(BaseVectorizer):
     """
@@ -10,10 +12,10 @@ class CustomTfidfVectorizer(BaseVectorizer):
     Builds a sparse term-by-document matrix and pre-normalizes vectors
     to optimize cosine similarity calculations.
     """
+
     def fit_transform(self, documents):
         # 1. Parse documents and extract global vocabulary
         tokenized_docs, df_counts, top_words, _ = self._build_base_vocab(documents)
-
 
         # 2. Calculate Inverse Document Frequency (IDF) for each word
         # Formula: IDF(w) = log(N / n_w). Smoothing (+1) is added to prevent division by zero.
@@ -22,7 +24,7 @@ class CustomTfidfVectorizer(BaseVectorizer):
             self.idx_to_word[word_idx] = word
             df = df_counts[word]
             self.idf[word_idx] = math.log((self.num_docs + 1) / (df + 1)) + 1
-            
+
         self.num_terms = len(self.vocab)
 
         # 3. Build the Term-by-Document Sparse Matrix
@@ -34,19 +36,20 @@ class CustomTfidfVectorizer(BaseVectorizer):
             term_counts = Counter(tokens)
             doc_sq_sum = 0.0
             for word, count in term_counts.items():
-                if word not in self.vocab: continue
+                if word not in self.vocab:
+                    continue
 
                 word_idx = self.vocab[word]
                 # Calculate TF-IDF weight for this specific word in this document
                 tfidf_score = count * self.idf[word_idx]
-                
+
                 rows.append(word_idx)
                 cols.append(doc_idx)
                 data.append(tfidf_score)
 
                 # Accumulate squared sum to calculate vector length (Euclidean norm) later
-                doc_sq_sum += tfidf_score ** 2
-            
+                doc_sq_sum += tfidf_score**2
+
             # Prevent division by zero for empty documents
             doc_norms[doc_idx] = max(math.sqrt(doc_sq_sum), 1e-9)
 
@@ -55,7 +58,9 @@ class CustomTfidfVectorizer(BaseVectorizer):
         data = np.array(data) / doc_norms[cols]
 
         # Create Compressed Sparse Column (CSC) matrix for fast column-based math operations
-        self.matrix = csc_matrix((data, (rows, cols)), shape=(self.num_terms, self.num_docs))
+        self.matrix = csc_matrix(
+            (data, (rows, cols)), shape=(self.num_terms, self.num_docs)
+        )
 
     def transform_query(self, query_text):
         """
@@ -74,5 +79,6 @@ class CustomTfidfVectorizer(BaseVectorizer):
 
         # Normalize the query vector to length 1 [cite: 27]
         q_norm = np.linalg.norm(q_vector)
-        if q_norm > 0: q_vector = q_vector / q_norm
+        if q_norm > 0:
+            q_vector = q_vector / q_norm
         return q_vector

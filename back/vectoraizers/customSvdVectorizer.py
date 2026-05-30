@@ -1,19 +1,21 @@
-from scipy.sparse.linalg import svds
 import numpy as np
+from scipy.sparse.linalg import svds
 
 
 class CustomSvdVectorizer:
     """
-    Wraps an existing TF-IDF vectorizer to transform its sparse term-document 
+    Wraps an existing TF-IDF vectorizer to transform its sparse term-document
     matrix into a dense, lower-dimensional "concept" space.
     """
+
     def __init__(self, base_tfidf_vectorizer, k=100):
         self.base = base_tfidf_vectorizer
         self.k = k
-        self.B = None         # Document representations in latent space
-        self.norm_Ak = None   # Precomputed norms of document vectors for fast cosine similarity
-        self.U_k = None       # Term-to-concept projection matrix
-
+        self.B = None  # Document representations in latent space
+        self.norm_Ak = (
+            None  # Precomputed norms of document vectors for fast cosine similarity
+        )
+        self.U_k = None  # Term-to-concept projection matrix
 
     def fit(self):
         """
@@ -38,10 +40,10 @@ class CustomSvdVectorizer:
         # OPTIMIZATION NOTE:
         # I explicitly avoid calculating the full dense matrix A_k = U_k @ D_k @ Vt_k.
         # For a large dataset it will be hard to compute.
-        # Instead, I compute and store only B = D_k @ Vt_k. The associative property of 
+        # Instead, I compute and store only B = D_k @ Vt_k. The associative property of
         # matrix multiplication allows us to achieve the exact same result during search
         # by projecting the query into the latent space first.
-        B = D_k @ Vt_k  
+        B = D_k @ Vt_k
         self.B = B
 
         # Precompute the lengths (norms) of each document vector in the latent space.
@@ -59,7 +61,7 @@ class CustomSvdVectorizer:
         q_vector = self.base.transform_query(query_text)
 
         # 2. Project the raw query vector into the latent concept space (q^T * U_k)
-        q_concept = q_vector @ self.U_k                        
+        q_concept = q_vector @ self.U_k
 
         # 3. Calculate the final dot product using the precomputed B matrix.
         # This effectively calculates (q^T * U_k) * (D_k * V_k^T) without building A_k.
@@ -70,4 +72,6 @@ class CustomSvdVectorizer:
 
         # 5. Sort and return the top_k results
         top_indices = np.argsort(scores)[-top_k:][::-1]
-        return [(int(idx), float(scores[idx])) for idx in top_indices if scores[idx] > 0]
+        return [
+            (int(idx), float(scores[idx])) for idx in top_indices if scores[idx] > 0
+        ]

@@ -2,7 +2,7 @@
 # Python / FastAPI
 # ================================
 
-data/
+data/*
 # Virtual environments
 venv/
 .venv/

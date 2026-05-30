@@ -1,4 +1,4 @@
-import SearchSection from "@/components/SearchSection";
+import SearchSection from "@/components/search/SearchSection";
 
 export default function Home() {
   return (

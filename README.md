@@ -76,7 +76,7 @@ The similarity is then computed in this reduced semantic space to improve recall
 **4.BM25 Ranking**
 An advanced probabilistic model that improves upon standard TF-IDF by introducing term frequency saturation (preventing the score from growing linearly with term frequency) and document length normalization:
 $$score(D, Q) = \sum_{i=1}^{n} IDF(q_i) \cdot \frac{f(q_i, D) \cdot (k_1 + 1)}{f(q_i, D) + k_1 \cdot \left(1 - b + b \cdot \frac{|D|}{avgdl}\right)}$$
-_Where $f(q_i, D)$ is the term frequency in the document, $|D|$ is the document length, and $avgdl$ is the average document length in the corpus. The parameters $k_1$ and $b$ control term saturation and length penalization, respectively._
+Where $f(q_i, D)$ is the term frequency in the document, $|D|$ is the document length, and $avgdl$ is the average document length in the corpus. The parameters $k_1$ and $b$ control term saturation and length penalization, respectively.
 
 ## Search Algorithms
 
@@ -103,12 +103,6 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Set the frontend origin in a `.env` file inside `back/`:
-
-```env
-FRONTEND_URL=http://localhost:3000
-```
-
 If the model files in `back/data/` are missing, build them first:
 
 ```bash
@@ -127,8 +121,8 @@ Install the frontend dependencies and start the development server:
 
 ```bash
 cd ../front
-npm install
-npm run dev
+bun install
+bun run
 ```
 
 ### 3. Open the application
