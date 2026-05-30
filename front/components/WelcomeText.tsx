@@ -20,8 +20,8 @@ export default function WelcomeText() {
         Just worst Google
       </h1>
       <p className="mx-auto max-w-xl text-lg text-slate-700 drop-shadow-sm">
-        Enter your query below to explore database using custom castom and
-        library algorithms.
+        Enter your query below to explore database using custom and library
+        algorithms.
       </p>
     </div>
   );

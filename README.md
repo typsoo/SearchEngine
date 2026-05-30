@@ -103,12 +103,6 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Set the frontend origin in a `.env` file inside `back/`:
-
-```env
-FRONTEND_URL=http://localhost:3000
-```
-
 If the model files in `back/data/` are missing, build them first:
 
 ```bash
@@ -127,8 +121,8 @@ Install the frontend dependencies and start the development server:
 
 ```bash
 cd ../front
-npm install
-npm run dev
+bun install
+bun run
 ```
 
 ### 3. Open the application

@@ -22,14 +22,15 @@ import pickle
 from datasets import load_dataset
 import nltk
 
+nltk.download('stopwords', quiet=True)
+nltk.download('punkt', quiet=True)
+nltk.download('punkt_tab', quiet=True)
+
 from vectoraizers.customTfIdfVectorizer import CustomTfidfVectorizer
 from vectoraizers.customBM25Vectorizer import CustomBM25Vectorizer
 from vectoraizers.customSvdVectorizer import CustomSvdVectorizer
 from vectoraizers.library_vectorizers import LibraryTfidfVectorizer, LibraryBm25Vectorizer
 
-nltk.download('stopwords', quiet=True)
-nltk.download('punkt', quiet=True)
-nltk.download('punkt_tab', quiet=True)
 
 print("Loading dataset...")
 dataset = load_dataset("wikimedia/wikipedia", "20231101.en", split="train[:90000]", trust_remote_code=False)
