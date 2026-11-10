@@ -1,8 +1,12 @@
 # SearchEngine
 
-SearchEngine is a full-stack search engine project built to compare multiple information retrieval approaches on a Wikipedia-based document collection. The backend exposes a FastAPI endpoint that searches across prebuilt indexes, while the frontend provides a Next.js interface for querying and displaying ranked results.
+In this project, I wanted to compare different search algorithms, implement them from scratch, and compare my implementations with library-based ones.
 
-Detailed implementation logic, architectural decisions, and step-by-step explanations are documented directly within the comments of the source code files.
+# Engine Demo
+
+<p align="center">
+  <img src=".github/assets/demo.gif" alt="Search Engine Demo" width="100%" style="border-radius: 8px; border: 1px solid #30363d;" />
+</p>
 
 ## Dataset & Scale
 
@@ -18,8 +22,6 @@ To rigorously test the algorithms, the project scales beyond basic toy datasets:
 - Python
 - FastAPI
 - Pydantic
-- Uvicorn
-- python-dotenv
 - NumPy
 - SciPy
 - scikit-learn
@@ -33,7 +35,6 @@ To rigorously test the algorithms, the project scales beyond basic toy datasets:
 - React
 - TypeScript
 - Tailwind CSS
-- ESLint
 
 ## Project Structure
 
@@ -73,7 +74,7 @@ Singular Value Decomposition and low-rank approximation are applied to the term-
 $$A \simeq A_k = U_k D_k V_k^T = \sum_{i=1}^{k} \sigma_i u_i v_i^T$$
 The similarity is then computed in this reduced semantic space to improve recall.
 
-**4.BM25 Ranking**
+**4. BM25 Ranking**
 An advanced probabilistic model that improves upon standard TF-IDF by introducing term frequency saturation (preventing the score from growing linearly with term frequency) and document length normalization:
 $$score(D, Q) = \sum_{i=1}^{n} IDF(q_i) \cdot \frac{f(q_i, D) \cdot (k_1 + 1)}{f(q_i, D) + k_1 \cdot \left(1 - b + b \cdot \frac{|D|}{avgdl}\right)}$$
 Where $f(q_i, D)$ is the term frequency in the document, $|D|$ is the document length, and $avgdl$ is the average document length in the corpus. The parameters $k_1$ and $b$ control term saturation and length penalization, respectively.
@@ -103,7 +104,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-If the model files in `back/data/` are missing, build them first:
+Then run the initialization script to calculate the matrices and build the search indexes. This may take a while.
 
 ```bash
 python init_script.py
@@ -127,10 +128,9 @@ bun run
 
 ### 3. Open the application
 
-- Backend API: `http://localhost:8000`
 - Frontend app: `http://localhost:3000`
 
 ## Notes
 
 - The backend expects the generated pickle files in `back/data/`.
-- The project is designed to compare classical search algorithms rather than neural retrieval models.
+- The project is designed to compare classical search algorithms.
